@@ -1,0 +1,318 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДомКлик - Стратегия ММ: Карта процесса (As-is)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #F1F5F9;
+            --sidebar: #1E293B;
+            --sidebar-text: #F1F5F9;
+            --main-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-secondary: #64748B;
+            --accent: #10B981;
+            --heading: #0F172A;
+            --border: #E2E8F0;
+            --hover-row: #F8FAFC;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            line-height: 1.5;
+        }
+
+        .sidebar {
+            background: var(--sidebar);
+            color: var(--sidebar-text);
+            width: 260px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 16px;
+            z-index: 100;
+        }
+
+        .sidebar h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94A3B8;
+            margin-bottom: 16px;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #CBD5E1;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item:hover {
+            background: #334155;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: var(--accent);
+            color: #FFFFFF;
+            font-weight: 500;
+        }
+
+        .main {
+            margin-left: 260px;
+            padding: 40px 48px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .block {
+            background: var(--main-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        h1 { font-size: 28px; color: var(--heading); margin-bottom: 32px; }
+        h2 { font-size: 22px; color: var(--heading); margin-bottom: 20px; border-left: 4px solid var(--accent); padding-left: 12px; }
+        
+        /* CJM Components */
+        .cjm-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+        }
+
+        .cjm-step {
+            min-width: 220px;
+            background: #FFF;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            position: relative;
+        }
+
+        .cjm-step::after {
+            content: '→';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #CBD5E1;
+            font-weight: bold;
+        }
+
+        .cjm-step:last-child::after { content: none; }
+
+        .step-num {
+            width: 24px; height: 24px; background: var(--accent); color: #FFF;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; margin-bottom: 12px;
+        }
+
+        .step-title { font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--heading); }
+        .step-desc { font-size: 12px; color: var(--text-secondary); }
+
+        .stress-bar {
+            height: 4px; border-radius: 2px; margin-top: 12px;
+        }
+        .stress-low { background: #10B981; }
+        .stress-mid { background: #F59E0B; }
+        .stress-high { background: #EF4444; }
+
+        .pain-point {
+            background: #FEF2F2; color: #991B1B; font-size: 11px; padding: 4px 8px;
+            border-radius: 4px; margin-top: 8px; border-left: 2px solid #EF4444;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #DCFCE7 0%, #FFFFFF 100%);
+            border: 1px solid #86EFAC;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+        }
+
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .badge-red { background: #FEE2E2; color: #991B1B; }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 style="color: white; margin-bottom: 30px; font-size: 18px;">Strategy Doc</h2>
+        
+        <h2>Карты процесса (Покупка)</h2>
+        <div class="nav-item active" onclick="show('c2c', this)">👥 Вторичка (C2C)</div>
+        <div class="nav-item" onclick="show('b2b', this)">�🏢 Первичка (B2B)</div>
+        <div class="nav-item" onclick="show('invest', this)">📈 Инвест-пул</div>
+
+        <div style="margin-top: 40px;">
+            <h2>Файлы курсовой</h2>
+            <div class="nav-item" onclick="location.href='1_Market_Analysis.html'">1. Анализ рынка</div>
+            <div class="nav-item" onclick="location.href='2_User_Research.html'">2. Исследование (JTBD)</div>
+            <div class="nav-item active">3. Карта процесса (As-is)</div>
+            <div class="nav-item" onclick="location.href='4_Economics.html'">4. Потенциал (Unit)</div>
+            <div class="nav-item" onclick="location.href='5_Hypothesis_USP.html'">5. Гипотеза и УТП</div>
+            <div class="nav-item" onclick="location.href='6_Roadmap_Effects.html'">6. Эффект и MVP</div>
+            <div class="nav-item" onclick="location.href='7_Risks.html'">7. Риски</div>
+        </div>
+    </div>
+
+    <div class="main">
+        <h1>Карта процесса покупки (As-is CJM)</h1>
+
+        <div class="highlight-box">
+            <h3>Статус-кво</h3>
+            <p>Рынок ММ сегодня - это <strong>"налоговый и юридический хаос"</strong>. Сделка на 1.5 млн ₽ оформляется так же долго, как на 15 млн ₽. Среднее время экспозиции ММ в Москве - <strong>164 дня</strong>. Домклик сокращает этот путь в 150 раз через автоматизацию всех 7 этапов сделки.</p>
+        </div>
+
+        <!-- SCENARIO: C2C SALE -->
+        <div id="section-c2c" class="section active">
+            <h2>Сценарий: Покупка ММ «у соседа» на вторичке</h2>
+            <div class="cjm-row">
+                <div class="cjm-step">
+                    <div class="step-num">1</div>
+                    <div class="step-title">Юр. проверка</div>
+                    <div class="step-desc">�-апрос выписки ЕГРН, проверка на залоги и аресты.</div>
+                    <div class="stress-bar stress-high"></div>
+                    <div class="pain-point">Сложно проверить "чистоту" без юриста</div>
+                </div>
+                <div class="cjm-step">
+                    <div class="step-num">2</div>
+                    <div class="step-title">Договор</div>
+                    <div class="step-desc">Поиск шаблона в интернете, ручное заполнение данных.</div>
+                    <div class="stress-bar stress-mid"></div>
+                    <div class="pain-point">Риск ошибок в паспортных данных и кадастре</div>
+                </div>
+                <div class="cjm-step">
+                    <div class="step-num">3</div>
+                    <div class="step-title">Сделка (МФЦ)</div>
+                    <div class="step-desc">Личный визит обеих сторон в МФЦ для подачи документов.</div>
+                    <div class="stress-bar stress-high"></div>
+                    <div class="pain-point">Потеря рабочего дня, очереди, пошлины</div>
+                </div>
+                <div class="cjm-step">
+                    <div class="step-num">4</div>
+                    <div class="step-title">Оплата</div>
+                    <div class="step-desc">Передача наличных или перевод "на доверии" до регистрации.</div>
+                    <div class="stress-bar stress-high"></div>
+                    <div class="pain-point">Риск остаться и без денег, и без места</div>
+                </div>
+                <div class="cjm-step">
+                    <div class="step-num">5</div>
+                    <div class="step-title">Регистрация</div>
+                    <div class="step-desc">Ожидание 7-10 дней подтверждения от Росреестра.</div>
+                    <div class="stress-bar stress-mid"></div>
+                    <div class="pain-point">Информационный вакуум во время ожидания</div>
+                </div>
+            </div>
+            <div class="block">
+                <h3>Диагноз: Паралич ликвидности</h3>
+                <p style="font-size: 14px; color: var(--text-secondary);">Сложность процесса заставляет людей годами не оформлять сделки, используя ММ "по доверенности" или просто бросая активы, что создает хаос в реестрах ЖК.</p>
+            </div>
+        </div>
+
+        <!-- SCENARIO: B2B DEVELOPER -->
+        <div id="section-b2b" class="section">
+            <h2>Сценарий: �-астройщик и "Мертвые" остатки</h2>
+            <div class="cjm-row">
+                <div class="cjm-step">
+                    <div class="step-num">1</div>
+                    <div class="step-title">Ожидание</div>
+                    <div class="step-desc">ММ стоит пустым, на него капает коммуналка и налоги.</div>
+                    <div class="stress-bar stress-high"></div>
+                    <div class="pain-point">Прямые убытки компании ежемесячно</div>
+                </div>
+                <div class="cjm-step">
+                    <div class="step-num">2</div>
+                    <div class="step-title">Маркетинг</div>
+                    <div class="step-desc">Попытки продать через стандартный офис продаж.</div>
+                    <div class="stress-bar stress-mid"></div>
+                    <div class="pain-point">Менеджеры фокусируются на квартирах</div>
+                </div>
+                <div class="cjm-step">
+                    <div class="step-num">3</div>
+                    <div class="step-title">Сделка</div>
+                    <div class="step-desc">Оформление ДКП, визит в банк, регистрация.</div>
+                    <div class="stress-bar stress-high"></div>
+                    <div class="pain-point">Слишком много бумаг для малого чека</div>
+                </div>
+            </div>
+            <div class="block">
+                <h3>Диагноз B2B сегмента</h3>
+                <p style="font-size: 14px; color: var(--text-secondary);">Для застройщика продажа ММ - это <strong>низкомаржинальная операционная обуза</strong>. Процесс покупки ММ почти так же сложен, как покупка квартиры, что отпугивает покупателей.</p>
+            </div>
+        </div>
+
+        <!-- SCENARIO: INVESTMENT POOL -->
+        <div id="section-invest" class="section">
+            <h2>Сценарий: Покупка инвестиционного пула (C2B/B2B)</h2>
+            <div class="cjm-row">
+                <div class="cjm-step">
+                    <div class="step-num">1</div>
+                    <div class="step-title">Подбор лотов</div>
+                    <div class="step-desc">Поиск 5-10 ММ в одном ЖК для инвестиций.</div>
+                    <div class="stress-bar stress-mid"></div>
+                    <div class="pain-point">Сложно собрать пул из разных рук/у застройщика</div>
+                </div>
+                <div class="cjm-step">
+                    <div class="step-num">2</div>
+                    <div class="step-title">Согласование</div>
+                    <div class="step-desc">Переговоры по оптовой цене и условиям.</div>
+                    <div class="stress-bar stress-high"></div>
+                    <div class="pain-point">Долгое согласование скидок и юр. обвязки</div>
+                </div>
+                <div class="cjm-step">
+                    <div class="step-num">3</div>
+                    <div class="step-title">Оформление</div>
+                    <div class="step-desc">Множественные сделки в МФЦ/банке.</div>
+                    <div class="stress-bar stress-high"></div>
+                    <div class="pain-point">X10 бюрократии на каждый объект пула</div>
+                </div>
+            </div>
+            <div class="block">
+                <h3>Диагноз: Отсутствие пакетных решений</h3>
+                <p style="font-size: 14px; color: var(--text-secondary);">Рынок не готов к инвесторам среднего чека. Отсутствие "пакетной" цифровой сделки делает инвестиции в 10 ММ такими же трудозатратными, как покупку 10 квартир.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function show(id, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            el.classList.add('active');
+            window.scrollTo(0,0);
+        }
+    </script>
+</body>
+</html>
+

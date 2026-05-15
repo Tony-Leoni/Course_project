@@ -1,0 +1,208 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДомКлик - Стратегия ММ: Анализ рисков</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #F1F5F9;
+            --sidebar: #1E293B;
+            --sidebar-text: #F1F5F9;
+            --main-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-secondary: #64748B;
+            --accent: #10B981;
+            --heading: #0F172A;
+            --border: #E2E8F0;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            line-height: 1.5;
+        }
+
+        .sidebar {
+            background: var(--sidebar);
+            color: var(--sidebar-text);
+            width: 260px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 16px;
+            z-index: 100;
+        }
+
+        .sidebar h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94A3B8;
+            margin-bottom: 16px;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #CBD5E1;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .nav-item:hover { background: #334155; color: #FFFFFF; }
+        .nav-item.active { background: var(--accent); color: #FFFFFF; font-weight: 500; }
+
+        .main {
+            margin-left: 260px;
+            padding: 40px 48px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        h1 { font-size: 28px; color: var(--heading); margin-bottom: 32px; }
+        h2 { font-size: 22px; color: var(--heading); margin-bottom: 24px; }
+
+        .risk-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #FFF;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .risk-table th {
+            background: #F8FAFC;
+            padding: 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .risk-table td {
+            padding: 16px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .impact-high { color: var(--danger); font-weight: 700; }
+        .impact-med { color: var(--warning); font-weight: 700; }
+
+        .mitigation {
+            background: #F0F9FF;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #0369A1;
+            border-left: 3px solid var(--accent);
+        }
+
+        .matrix-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 32px;
+        }
+
+        .matrix-card {
+            background: #FFF;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .matrix-card h3 { font-size: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 style="color: white; margin-bottom: 30px; font-size: 18px;">Strategy Doc</h2>
+        
+        <h2>Анализ</h2>
+        <div class="nav-item active">🛡️ Риски и Митигация</div>
+
+        <div style="margin-top: 40px;">
+            <h2>Файлы курсовой</h2>
+            <div class="nav-item" onclick="location.href='1_Market_Analysis.html'">1. Анализ рынка</div>
+            <div class="nav-item" onclick="location.href='2_User_Research.html'">2. Исследование (JTBD)</div>
+            <div class="nav-item" onclick="location.href='3_Process_Map.html'">3. Карта процесса (As-is)</div>
+            <div class="nav-item" onclick="location.href='4_Economics.html'">4. Потенциал (Unit)</div>
+            <div class="nav-item" onclick="location.href='5_Hypothesis_USP.html'">5. Гипотеза и УТП</div>
+            <div class="nav-item" onclick="location.href='6_Roadmap_Effects.html'">6. Эффект и MVP</div>
+            <div class="nav-item active">7. Риски</div>
+        </div>
+    </div>
+
+    <div class="main">
+        <h1>Анализ рисков и способы минимизации</h1>
+
+        <table class="risk-table">
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Наименование риска</th>
+                    <th style="width: 15%;">Влияние</th>
+                    <th style="width: 15%;">Вероятность</th>
+                    <th style="width: 45%;">Способ минимизации (Mitigation)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Юридическая "чистота"</strong><br><span style="font-size:11px; color:var(--text-secondary);">Скрытые обременения</span></td>
+                    <td><span class="impact-high">ВЫСОКОЕ</span></td>
+                    <td>Средняя</td>
+                    <td>
+                        <div class="mitigation">Автоматический скоринг объекта по базам Росреестра и ФССП. Холдирование денег в СБР до момента перехода права собственности.</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Фрод с УКЭП</strong><br><span style="font-size:11px; color:var(--text-secondary);">Подделка подписи</span></td>
+                    <td><span class="impact-high">ВЫСОКОЕ</span></td>
+                    <td>Низкая</td>
+                    <td>
+                        <div class="mitigation">Выпуск электронной подписи только через личный визит в банк или по биометрии Сбера. Двухфакторное подтверждение сделки.</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>�Задержки регистрации</strong><br><span style="font-size:11px; color:var(--text-secondary);">Сбои в Росреестре</span></td>
+                    <td>Среднее</td>
+                    <td>Высокая</td>
+                    <td>
+                        <div class="mitigation">Юридическое сопровождение "под ключ". Авто-информирование сторон о каждом этапе прохождения документов в реестре.</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Налоговые риски</strong><br><span style="font-size:11px; color:var(--text-secondary);">НДФЛ с продажи</span></td>
+                    <td>Среднее</td>
+                    <td>Средняя</td>
+                    <td>
+                        <div class="mitigation">Встроенный налоговый калькулятор. Авто-заполнение декларации 3-НДФЛ на основе данных о сделке в приложении.</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="matrix-card" style="margin-top: 32px;">
+            <h3>📊 Главный вывод</h3>
+            <p style="font-size: 13px; color: var(--text-secondary);">Ключ к успеху стратегии - не в борьбе с рынком, а в <strong>легализации</strong> текущего хаоса. ДомКлик должен стать "государством" в мире парковок, дающим безопасность и комфорт там, где сейчас царит неопределенность.</p>
+        </div>
+    </div>
+</body>
+</html>
+

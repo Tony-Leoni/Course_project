@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДомКлик - Стратегия ММ: Дорожная карта и Эффекты</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #F1F5F9;
+            --sidebar: #1E293B;
+            --sidebar-text: #F1F5F9;
+            --main-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-secondary: #64748B;
+            --accent: #10B981;
+            --heading: #0F172A;
+            --border: #E2E8F0;
+            --success: #10B981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            line-height: 1.5;
+        }
+
+        .sidebar {
+            background: var(--sidebar);
+            color: var(--sidebar-text);
+            width: 260px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 16px;
+            z-index: 100;
+        }
+
+        .sidebar h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94A3B8;
+            margin-bottom: 16px;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #CBD5E1;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .nav-item:hover { background: #334155; color: #FFFFFF; }
+        .nav-item.active { background: var(--accent); color: #FFFFFF; font-weight: 500; }
+
+        .main {
+            margin-left: 260px;
+            padding: 40px 48px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { font-size: 28px; color: var(--heading); margin-bottom: 32px; }
+        h2 { font-size: 22px; color: var(--heading); margin-bottom: 24px; }
+
+        /* TIMELINE STYLES */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 40px 0;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 48px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -40px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #FFF;
+            border: 4px solid var(--accent);
+            z-index: 2;
+        }
+
+        .timeline-date {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .timeline-content {
+            background: #FFF;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .timeline-content h3 { margin-bottom: 12px; font-size: 18px; }
+        .timeline-content ul { list-style: none; padding-left: 0; }
+        .timeline-content li { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .timeline-content li::before { content: '→'; color: var(--accent); }
+
+        /* EFFECT CARDS */
+        .effect-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .effect-card {
+            background: #FFF;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .effect-card h3 { font-size: 16px; margin-bottom: 16px; color: var(--heading); }
+        .effect-val { font-size: 24px; font-weight: 700; color: var(--success); margin-bottom: 4px; }
+        .effect-desc { font-size: 12px; color: var(--text-secondary); }
+
+        .badge-step {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #DBEAFE;
+            color: #1E40AF;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+
+        .tbl-container { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+        .tbl { width: 100%; border-collapse: collapse; background: #FFF; }
+        .tbl th { background: var(--sidebar); color: #FFFFFF; padding: 12px 16px; text-align: left; font-size: 13px; }
+        .tbl td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 14px; }
+        .tbl tr:hover td { background: #F8FAFC; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .badge-green { background: #DCFCE7; color: #166534; }
+        .badge-red { background: #FEE2E2; color: #991B1B; }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 style="color: white; margin-bottom: 30px; font-size: 18px;">Strategy Doc</h2>
+        
+        <h2>Реализация</h2>
+        <div class="nav-item active" onclick="show('roadmap', this)">📅 Дорожная карта</div>
+        <div class="nav-item" onclick="show('effects', this)">🚀 Бизнес-эффекты</div>
+
+        <div style="margin-top: 40px;">
+            <h2>Файлы курсовой</h2>
+            <div class="nav-item" onclick="location.href='1_Market_Analysis.html'">1. Анализ рынка</div>
+            <div class="nav-item" onclick="location.href='2_User_Research.html'">2. Исследование (JTBD)</div>
+            <div class="nav-item" onclick="location.href='3_Process_Map.html'">3. Карта процесса (As-is)</div>
+            <div class="nav-item" onclick="location.href='4_Economics.html'">4. Потенциал (Unit)</div>
+            <div class="nav-item" onclick="location.href='5_Hypothesis_USP.html'">5. Гипотеза и УТП</div>
+            <div class="nav-item active">6. Эффект и MVP</div>
+            <div class="nav-item" onclick="location.href='7_Risks.html'">7. Риски</div>
+        </div>
+    </div>
+
+    <div class="main">
+        <!-- SECTION: ROADMAP -->
+        <div id="section-roadmap" class="section active">
+            <h2>Дорожная карта реализации (5 Фаз)</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <span class="timeline-date">Месяц 1–2</span>
+                    <div class="timeline-content">
+                        <span class="badge-step">Фаза 1: Tech Prep</span>
+                        <h3>Технологический фундамент</h3>
+                        <ul>
+                            <li>Интеграция с API Росреестра для авто-выписки (< 5 сек).</li>
+                            <li>Адаптация микро-эскроу (СБР) под транзакции машино-мест.</li>
+                            <li>Рекрутинг 50 продавцов-тестировщиков из чатов ЖК.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <span class="timeline-date">Месяц 3–4</span>
+                    <div class="timeline-content">
+                        <span class="badge-step">Фаза 2: MVP Pilot</span>
+                        <h3>Запуск Stand-alone P2P</h3>
+                        <ul>
+                            <li>Запуск генератора P2P-ссылок на сделку.</li>
+                            <li>Пилот в 5 ЖК Москвы (цель: 100 сделок).</li>
+                            <li>Критерий: Conversion листинг→сделка > 5%; NPS > 60.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <span class="timeline-date">Месяц 5–7</span>
+                    <div class="timeline-content">
+                        <span class="badge-step">Фаза 3: GTM Scale</span>
+                        <h3>Масштабирование и Embed</h3>
+                        <ul>
+                            <li>Интеграция кнопки в основной каталог Домклик.</li>
+                            <li>PR-кампания «Легализация парковки».</li>
+                            <li>Запуск реферальной программы для УК.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <span class="timeline-date">Месяц 8–10</span>
+                    <div class="timeline-content">
+                        <span class="badge-step">Фаза 4: Expansion</span>
+                        <h3>API/SDK и Регионы</h3>
+                        <ul>
+                            <li>Масштабирование на ТОП-10 городов РФ.</li>
+                            <li>Пилот SDK для 5 Управляющих компаний.</li>
+                            <li>Запуск AI-оценщика на базе обезличенных данных.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <span class="timeline-date">Месяц 11–12</span>
+                    <div class="timeline-content">
+                        <span class="badge-step">Фаза 5: Ecosystem</span>
+                        <h3>B2B и Пакетные сделки</h3>
+                        <ul>
+                            <li>B2B-портал для девелоперов (распродажа остатков).</li>
+                            <li>Пакетное оформление (bulk transactions) для инвесторов.</li>
+                            <li>Цель: 5 000 сделок/мес., выручка > 25 млн ₽/мес.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: EFFECTS -->
+        <div id="section-effects" class="section">
+            <h2>Ожидаемые стратегические эффекты</h2>
+            <div class="effect-grid">
+                <div class="effect-card">
+                    <h3>🚀 Скорость сделки</h3>
+                    <p class="effect-val">24 часа</p>
+                    <p class="effect-desc">Сокращение цикла сделки с 14 дней до суток за счет исключения бумажной волокиты и визитов в МФЦ.</p>
+                </div>
+                <div class="effect-card">
+                    <h3>💰 Новая выручка</h3>
+                    <p class="effect-val">88.5 млн ₽/год</p>
+                    <p class="effect-desc">Комиссионный доход от базового сценария за первый год за счет фиксированных сборов (СБР + Регистрация).</p>
+                </div>
+                <div class="effect-card">
+                    <h3>🤝 Социальный эффект</h3>
+                    <p class="effect-val">100% легальность</p>
+                    <p class="effect-desc">Вывод рынка машино-мест из «серой» зоны (переводы на карту без договора) в полностью прозрачное поле.</p>
+                </div>
+                <div class="effect-card">
+                    <h3>😊 NPS и Доверие</h3>
+                    <p class="effect-val">Без "страха соседа"</p>
+                    <p class="effect-desc">Покупатели и продавцы из одного ЖК могут проводить сделки без риска конфликтов или мошенничества.</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 48px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #FFF; padding: 32px; border-radius: 16px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 24px;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <h2 style="color: #FFF; border-left: none; padding-left: 0; margin-bottom: 8px; font-size: 28px;">Зачем это Домклик? (Главная цель MVP)</h2>
+                        <p style="opacity: 0.9; font-size: 15px; margin-bottom: 20px;">Новый продукт должен достичь одной из трех целей за год (300 млн руб., +500k MAU, или 100k уникальных клиентов).</p>
+                        
+                        <div style="background: rgba(255,255,255,0.15); padding: 16px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3); margin-bottom: 16px;">
+                            <h3 style="color: #FFF; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                                <span style="background: #FFF; color: #059669; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px;">✓</span>
+                                Качественное улучшение клиентского опыта
+                            </h3>
+                            <p style="font-size: 24px; font-weight: 700; margin: 0;">100 000 уникальных клиентов</p>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; min-width: 300px; background: #FFF; color: var(--text-main); padding: 24px; border-radius: 12px;">
+                        <h3 style="margin-bottom: 16px; color: var(--heading); font-size: 16px;">Почему именно эта цель?</h3>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="margin-bottom: 12px; font-size: 13px; display: flex; align-items: flex-start; gap: 8px;">
+                                <span style="color: #10B981; font-weight: bold;">1.</span> 
+                                <div><strong>Реалистичность ниши:</strong> Генерировать 300 млн прибыли в 1-й год только на фикс-комиссиях (без кредитов) — математически невозможно без завышения цен. Наша цель — монополия доверия, а не сиюминутный кэш.</div>
+                            </li>
+                            <li style="margin-bottom: 12px; font-size: 13px; display: flex; align-items: flex-start; gap: 8px;">
+                                <span style="color: #10B981; font-weight: bold;">2.</span> 
+                                <div><strong>Влияние на бренд (Trust):</strong> При 35 тыс. сделок (Optimistic), мы напрямую касаемся ~100 тыс. человек (покупатели, продавцы, члены семей). Мы забираем их из "гаражных" переводов и даем им премиум-сделку в 1 клик.</div>
+                            </li>
+                            <li style="font-size: 13px; display: flex; align-items: flex-start; gap: 8px;">
+                                <span style="color: #10B981; font-weight: bold;">3.</span> 
+                                <div><strong>Задел на Экосистему:</strong> Решив эту боль, мы получаем лояльную аудиторию с высоким LTV (жители Комфорт/Бизнес класса), которые позже придут в Домклик за ипотекой или ремонтом.</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 48px; background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #FFF; padding: 32px; border-radius: 16px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);">
+                <h2 style="color: #FFF; border: none; padding: 0; margin-bottom: 24px; font-size: 26px;">Сравнение вариантов целей (Фреймворк защиты продукта)</h2>
+                
+                <div style="background: #FFF; color: var(--text-main); padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                    <div class="tbl-container" style="border: 1px solid var(--border); margin-bottom: 0;">
+                        <table class="tbl">
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%;">Вариант цели (KPI на 1 год)</th>
+                                    <th style="width: 35%;">Оценка реалистичности в нише ММ</th>
+                                    <th style="width: 25%;">Стратегическое влияние</th>
+                                    <th style="width: 15%;">Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>1. 300 млн руб. прибыли</strong></td>
+                                    <td style="color: #EF4444;">Математически невозможно без завышения тарифов (до 15-20 тыс. руб.), что убьет конверсию.</td>
+                                    <td>Гонка за сиюминутным кэшем вместо построения долгосрочной монополии доверия на C2C рынке.</td>
+                                    <td><span class="badge badge-red">ОТКЛОНЕНО</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>2. Привлечь +500 000 MAU</strong></td>
+                                    <td style="color: #EF4444;">Утопия. На узком рынке машино-мест нет такого огромного объема регулярной (ежемесячной) аудитории.</td>
+                                    <td>Нагон нецелевого, "холодного" трафика без реальной транзакционной ценности и монетизации.</td>
+                                    <td><span class="badge badge-red">ОТКЛОНЕНО</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>3. 100 000 уник. клиентов</strong><br><span style="font-size: 12px; color: var(--text-secondary); font-weight: normal;">(с новым качественным опытом)</span></td>
+                                    <td style="color: #10B981; font-weight: 500;">Высокая. Достижимо при базовом/оптимистичном сценарии (охват покупателей, продавцов и их семей).</td>
+                                    <td>Экосистемный эффект: лояльная аудитория с высоким LTV, которая в будущем придет за ипотекой и ремонтом.</td>
+                                    <td><span class="badge badge-green">ЦЕЛЕВОЙ ВЫБОР</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function show(id, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            el.classList.add('active');
+            window.scrollTo(0,0);
+        }
+    </script>
+</body>
+</html>
+

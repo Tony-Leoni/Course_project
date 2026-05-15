@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДомКлик - Стратегия ММ: Гипотезы и УТП</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #F1F5F9;
+            --sidebar: #1E293B;
+            --sidebar-text: #F1F5F9;
+            --main-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-secondary: #64748B;
+            --accent: #10B981;
+            --heading: #0F172A;
+            --border: #E2E8F0;
+            --hover-row: #F8FAFC;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            line-height: 1.5;
+        }
+
+        .sidebar {
+            background: var(--sidebar);
+            color: var(--sidebar-text);
+            width: 260px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 16px;
+            z-index: 100;
+        }
+
+        .sidebar h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94A3B8;
+            margin-bottom: 16px;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #CBD5E1;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item:hover {
+            background: #334155;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: var(--accent);
+            color: #FFFFFF;
+            font-weight: 500;
+        }
+
+        .main {
+            margin-left: 260px;
+            padding: 40px 48px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .block {
+            background: var(--main-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        h1 { font-size: 28px; color: var(--heading); margin-bottom: 32px; }
+        h2 { font-size: 22px; color: var(--heading); margin-bottom: 20px; border-left: 4px solid var(--accent); padding-left: 12px; }
+        h3 { font-size: 18px; color: var(--heading); margin-bottom: 12px; }
+
+        .hypo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .hypo-card {
+            background: #FFF;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--accent);
+        }
+
+        .hypo-card h4 { color: var(--accent); font-size: 12px; text-transform: uppercase; margin-bottom: 8px; }
+        .hypo-card p { font-size: 14px; margin-bottom: 12px; }
+        .hypo-tag { font-size: 11px; font-weight: 700; background: #F1F5F9; padding: 4px 8px; border-radius: 4px; color: var(--text-secondary); }
+
+        .usp-container {
+            background: linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%);
+            border: 1px solid #DBEAFE;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+        }
+
+        .usp-row {
+            display: flex;
+            gap: 24px;
+            margin-top: 24px;
+            align-items: stretch;
+        }
+
+        .usp-item { 
+            flex: 1; 
+            background: #FFFFFF;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+        }
+        .usp-item h4 { font-size: 16px; margin-bottom: 16px; color: var(--heading); display: flex; align-items: center; gap: 8px; }
+        .usp-item ul { list-style: none; }
+        .usp-item li { 
+            font-size: 13px; 
+            color: var(--text-secondary); 
+            margin-bottom: 12px; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 10px; 
+            line-height: 1.4;
+        }
+        .usp-item li::before { 
+            content: '✓'; 
+            color: #10B981; 
+            font-weight: bold; 
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .feature {
+            background: #F8FAFC;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .feature::after {
+            content: '▾';
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: transform 0.3s;
+        }
+        .feature.active::after {
+            transform: rotate(180deg);
+            color: var(--accent);
+        }
+        .feature:hover {
+            background: #FFF;
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+        .feature-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .feature-label { font-size: 12px; font-weight: 600; }
+        
+        .feature-detail {
+            display: none;
+            margin-top: 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-align: left;
+            border-top: 1px solid var(--border);
+            padding-top: 8px;
+            animation: slideDown 0.2s ease-out;
+        }
+        .feature.active .feature-detail, 
+        .hypo-card.active .feature-detail { display: block; }
+
+        .hypo-card {
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            padding-right: 40px !important;
+        }
+        .hypo-card::after {
+            content: '▾';
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 20px;
+            color: var(--text-secondary);
+            transition: transform 0.3s;
+        }
+        .hypo-card.active::after {
+            transform: rotate(180deg);
+            color: var(--accent);
+        }
+        .hypo-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 style="color: white; margin-bottom: 30px; font-size: 18px;">Strategy Doc</h2>
+        
+        <h2>Продукт</h2>
+        <div class="nav-item active" onclick="show('hypo', this)">🧪 Гипотезы</div>
+        <div class="nav-item" onclick="show('usp', this)">💎 УТП</div>
+        <div class="nav-item" onclick="show('features', this)">🛠️ Фичи (MVP)</div>
+
+        <div style="margin-top: 40px;">
+            <h2>Файлы курсовой</h2>
+            <div class="nav-item" onclick="location.href='1_Market_Analysis.html'">1. Анализ рынка</div>
+            <div class="nav-item" onclick="location.href='2_User_Research.html'">2. Исследование (JTBD)</div>
+            <div class="nav-item" onclick="location.href='3_Process_Map.html'">3. Карта процесса (As-is)</div>
+            <div class="nav-item" onclick="location.href='4_Economics.html'">4. Потенциал (Unit)</div>
+            <div class="nav-item active">5. Гипотеза и УТП</div>
+            <div class="nav-item" onclick="location.href='6_Roadmap_Effects.html'">6. Эффект и MVP</div>
+            <div class="nav-item" onclick="location.href='7_Risks.html'">7. Риски</div>
+        </div>
+    </div>
+
+    <div class="main">
+        <h1>Продуктовая гипотеза и УТП</h1>
+
+
+        <!-- SECTION: GTM STRATEGY -->
+        <div id="section-hypo" class="section active">
+            <h2>GTM-стратегия: 3 варианта запуска</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Кликните на вариант, чтобы развернуть детали:</p>
+            <div class="hypo-grid">
+                <div class="hypo-card" onclick="toggleFeature(this)">
+                    <h4>Вариант 1: Встраивание (Embed)</h4>
+                    <p>Вертикаль «Машино-места» в каталоге Домклик рядом с квартирами. Листинг ММ → бейдж «Верифицировано» → кнопка «Оформить».</p>
+                    <div class="feature-detail">
+                        <strong>Механика:</strong> Полный цикл эскроу + авторегистрация внутри воронки Домклик. Оплата через СБР Сбера.<br><br>
+                        <strong>Метрики:</strong> Conversion листинг→сделка > 8%; Time-to-close < 24 ч.
+                    </div>
+                    <span class="hypo-tag">Масштабирование (Фаза 2)</span>
+                </div>
+                <div class="hypo-card" onclick="toggleFeature(this)" style="border-color: #10B981;">
+                    <h4 style="color: #10B981;">Вариант 2: Stand-alone (P2P-ссылка) 🏆</h4>
+                    <p>Отдельный микро-сервис, где продавец генерирует «ссылку на сделку» и делится ею прямо в чате своего ЖК в Telegram/WhatsApp.</p>
+                    <div class="feature-detail">
+                        <strong>Механика:</strong> Ввод кадастрового № → получение ссылки → шэринг соседям. Покупатель переходит по ссылке и оплачивает через СБР.<br><br>
+                        <strong>Виральный эффект:</strong> Ссылка органически расходится по чату (100–500 соседей). K-factor > 1.2; CAC < 500 ₽; TTM: 6–8 недель.
+                    </div>
+                    <span class="hypo-tag" style="background: #D1FAE5; color: #065F46;">Рекомендовано для MVP</span>
+                </div>
+                <div class="hypo-card" onclick="toggleFeature(this)">
+                    <h4>Вариант 3: API/SDK (B2B2C)</h4>
+                    <p>Домклик предоставляет SDK с эскроу-модулем для интеграции в приложения УК и боты ЖК. УК становится каналом дистрибуции.</p>
+                    <div class="feature-detail">
+                        <strong>Механика:</strong> Жители видят кнопку «Продать место» в приложении своей УК. Весь флоу Домклик работает под капотом.<br><br>
+                        <strong>Эффект:</strong> 1 подключённая УК = 500–5000 квартир охвата сразу. 20 УК-партнёров за год; TTM: 4–6 мес.
+                    </div>
+                    <span class="hypo-tag">Экосистема (Фаза 3)</span>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 32px; margin-bottom: 16px;">Сравнение вариантов GTM</h3>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; background: #FFF; border-radius: 8px; overflow: hidden; border: 1px solid var(--border);">
+                    <thead>
+                        <tr style="background: var(--sidebar); color: #FFF; text-align: left; font-size: 13px;">
+                            <th style="padding: 12px 16px;">Критерий</th>
+                            <th style="padding: 12px 16px;">Вариант 1: Embed</th>
+                            <th style="padding: 12px 16px;">Вариант 2: Stand-alone</th>
+                            <th style="padding: 12px 16px;">Вариант 3: API/SDK</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 600;">Time-to-Market</td>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px;">10–12 недель</td>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; color: #10B981;">6–8 недель</td>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px;">4–6 месяцев</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 600;">Каннибализация</td>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px;">Средняя</td>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; color: #10B981;">Минимальная</td>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px;">Минимальная</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 600;">Виральность в ЖК</td>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px;">Низкая</td>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; color: #10B981;">Высокая</td>
+                            <td style="padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; color: #10B981;">Очень высокая</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION: USP -->
+        <div id="section-usp" class="section">
+            <div class="usp-container">
+                <h3>Уникальное торговое предложение (USP)</h3>
+                <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">ДомКлик - это <strong>единственная в РФ экосистема</strong>, закрывающая весь цикл покупки машино-места: от проверки чистоты до регистрации собственности.</p>
+                
+                <div class="usp-row">
+                    <div class="usp-item">
+                        <h4>👤 Покупателю</h4>
+                        <ul>
+                            <li><strong>«Сделка за обедом»:</strong> Покупка паркинга в 3 клика без визита в банк и МФЦ.</li>
+                            <li><strong>Юр. защита Сбера:</strong> Мы гарантируем "чистоту" объекта на базе BIG DATA и выписок из ЕГРН.</li>
+                            <li><strong>Безопасность:</strong> Деньги продавцу уйдут только после смены записи в реестре.</li>
+                        </ul>
+                    </div>
+                    <div class="usp-item">
+                        <h4>📈 Продавцу</h4>
+                        <ul>
+                            <li><strong>Оценка за 5 секунд:</strong> AI-алгоритм подскажет рыночную цену на основе реальных сделок в ЖК.</li>
+                            <li><strong>Доступ к аудитории Сбера:</strong> Ваше объявление увидят миллионы пользователей Домклик.</li>
+                            <li><strong>SBR-Lite:</strong> Моментальное зачисление денег на карту сразу после регистрации.</li>
+                        </ul>
+                    </div>
+                    <div class="usp-item">
+                        <h4>�-️ Девелоперу</h4>
+                        <ul>
+                            <li><strong>Ликвидация "хвостов":</strong> Цифровой канал продажи остатков с минимальным CPA.</li>
+                            <li><strong>Fast Track:</strong> Оформление 100 сделок в один клик через API Домклик.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: FEATURES -->
+        <div id="section-features" class="section">
+            <h2>Функциональный состав (MVP)</h2>
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">Нажмите на карточку, чтобы узнать подробнее:</p>
+            <div class="feature-grid">
+                <div class="feature" onclick="toggleFeature(this)">
+                    <span class="feature-icon">📑</span>
+                    <span class="feature-label">Цифровая сделка (УКЭП)</span>
+                    <div class="feature-detail">
+                        <strong>Что это:</strong> Подписание договора купли-продажи через мобильное приложение.
+                        <strong>Польза:</strong> Не нужно ехать к нотариусу или в МФЦ. Сделка имеет полную юридическую силу.
+                    </div>
+                </div>
+                <div class="feature" onclick="toggleFeature(this)">
+                    <span class="feature-icon">🏦</span>
+                    <span class="feature-label">Безопасные расчеты (СБР)</span>
+                    <div class="feature-detail">
+                        <strong>Что это:</strong> Деньги покупателя хранятся в Сбере до подтверждения регистрации права в Росреестре.
+                        <strong>Польза:</strong> 100% защита от мошенничества для обеих сторон.
+                    </div>
+                </div>
+                <div class="feature" onclick="toggleFeature(this)">
+                    <span class="feature-icon">🔍</span>
+                    <span class="feature-label">Автоматическая проверка ЕГРН</span>
+                    <div class="feature-detail">
+                        <strong>Что это:</strong> Мгновенная проверка объекта на аресты, залоги и обременения.
+                        <strong>Польза:</strong> Покупатель видит "чистоту" места еще до нажатия кнопки "Купить".
+                    </div>
+                </div>
+                <div class="feature" onclick="toggleFeature(this)">
+                    <span class="feature-icon">📊</span>
+                    <span class="feature-label">AI-Оценка стоимости</span>
+                    <div class="feature-detail">
+                        <strong>Что это:</strong> Алгоритм определяет справедливую цену на основе истории сделок в конкретном ЖК.
+                        <strong>Польза:</strong> Продавец не занижает цену, а покупатель не переплачивает.
+                    </div>
+                </div>
+                <div class="feature" onclick="toggleFeature(this)">
+                    <span class="feature-icon">🧾</span>
+                    <span class="feature-label">Авто-расчёт налога (3-НДФЛ)</span>
+                    <div class="feature-detail">
+                        <strong>Что это:</strong> Встроенный калькулятор НДФЛ с продажи ММ - расчёт налоговой базы, учёт вычетов и автозаполнение декларации 3-НДФЛ на основе данных сделки.
+                        <strong>Польза:</strong> Продавец видит «чистую» сумму на руки ещё до подписания договора. Снижается риск налоговых претензий и повышается доверие к платформе.
+                    </div>
+                </div>
+                <div class="feature" onclick="toggleFeature(this)">
+                    <span class="feature-icon">📁</span>
+                    <span class="feature-label">Пакетное оформление</span>
+                    <div class="feature-detail">
+                        <strong>Что это:</strong> Возможность оформить покупку нескольких объектов в рамках одной сессии.
+                        <strong>Польза:</strong> Экономия времени для инвесторов и оптовых покупателей.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function show(id, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            el.classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function toggleFeature(el) {
+            el.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
+

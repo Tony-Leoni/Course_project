@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ДомКлик - Стратегия ММ: Исследование пользователя</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #F1F5F9;
+            --sidebar: #1E293B;
+            --sidebar-text: #F1F5F9;
+            --main-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-secondary: #64748B;
+            --accent: #10B981;
+            --heading: #0F172A;
+            --border: #E2E8F0;
+            --hover-row: #F8FAFC;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            line-height: 1.5;
+        }
+
+        .sidebar {
+            background: var(--sidebar);
+            color: var(--sidebar-text);
+            width: 260px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 16px;
+            z-index: 100;
+        }
+
+        .sidebar h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94A3B8;
+            margin-bottom: 16px;
+            padding: 0 12px;
+        }
+
+        .nav-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #CBD5E1;
+            margin-bottom: 4px;
+            transition: all 0.2s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-item:hover {
+            background: #334155;
+            color: #FFFFFF;
+        }
+
+        .nav-item.active {
+            background: var(--accent);
+            color: #FFFFFF;
+            font-weight: 500;
+        }
+
+        .main {
+            margin-left: 260px;
+            padding: 40px 48px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .block {
+            background: var(--main-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        h1 { font-size: 28px; color: var(--heading); margin-bottom: 32px; }
+        h2 { font-size: 22px; color: var(--heading); margin-bottom: 20px; border-left: 4px solid var(--accent); padding-left: 12px; }
+        h3 { font-size: 18px; color: var(--heading); margin-bottom: 12px; }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: var(--main-bg);
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .persona-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; background: #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+        
+        .jtbd-item { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+        .jtbd-item:last-child { border-bottom: none; }
+        .jtbd-tag { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; display: block; }
+
+        .tbl-container { overflow-x: auto; margin-bottom: 24px; border-radius: 8px; border: 1px solid var(--border); }
+        .tbl { width: 100%; border-collapse: collapse; background: #FFF; }
+        .tbl th { background: var(--sidebar); color: #FFFFFF; padding: 12px 16px; text-align: left; font-size: 13px; }
+        .tbl td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 14px; }
+
+        .simulator { margin-top: 20px; }
+        .q-box { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; }
+        .a-box { display: none; background: #F0FDF4; border: 1px solid #BBF7D0; padding: 12px 16px; border-radius: 8px; margin-top: 8px; color: #166534; }
+        .btn-show { background: var(--accent); color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 12px; cursor: pointer; margin-top: 8px; }
+
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .badge-blue { background: #DBEAFE; color: #1E40AF; }
+        .badge-green { background: #DCFCE7; color: #166534; }
+        .badge-red { background: #FEE2E2; color: #991B1B; }
+
+        .quote { font-style: italic; color: var(--text-secondary); border-left: 3px solid #CBD5E1; padding-left: 12px; margin: 12px 0; font-size: 14px; }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 style="color: white; margin-bottom: 30px; font-size: 18px;">Strategy Doc</h2>
+        
+        <h2>Разделы исследования</h2>
+        <div class="nav-item active" onclick="show('jtbd', this)">🎯 Ключевые JTBD</div>
+        <div class="nav-item" onclick="show('personas', this)">👤 Персоны пользователей</div>
+        <div class="nav-item" onclick="show('evolution', this)">📈 Эволюция запроса</div>
+
+        <div style="margin-top: 40px;">
+            <h2>Файлы курсовой</h2>
+            <div class="nav-item" onclick="location.href='1_Market_Analysis.html'">1. Анализ рынка</div>
+            <div class="nav-item active">2. Исследование (JTBD)</div>
+            <div class="nav-item" onclick="location.href='3_Process_Map.html'">3. Карта процесса (As-is)</div>
+            <div class="nav-item" onclick="location.href='4_Economics.html'">4. Потенциал (Unit)</div>
+            <div class="nav-item" onclick="location.href='5_Hypothesis_USP.html'">5. Гипотеза и УТП</div>
+            <div class="nav-item" onclick="location.href='6_Roadmap_Effects.html'">6. Эффект и MVP</div>
+            <div class="nav-item" onclick="location.href='7_Risks.html'">7. Риски</div>
+        </div>
+    </div>
+
+    <div class="main">
+        <h1>Исследование пользователя и JTBD</h1>
+
+        <!-- SECTION: JTBD -->
+        <div id="section-jtbd" class="section active">
+            <div class="block">
+                <h2>5 Ключевых Jobs-to-be-Done</h2>
+                <div class="jtbd-item">
+                    <span class="jtbd-tag">🛡️ Безопасность и Юридическая защита</span>
+                    <h3>«Когда я покупаю место за миллионы у частного лица, я хочу прозрачный процесс и гарантию банка, что деньги уйдут продавцу только после подтверждения моих прав в Росреестре».</h3>
+                    <p class="quote">"Страшно отдавать деньги под расписку. Хочу, чтобы Домклик гарантировал: объект чист, а сделка не будет оспорена из-за чьих-то долгов или арестов."</p>
+                    <div class="badge badge-red">Критическая боль</div>
+                </div>
+
+                <div class="jtbd-item">
+                    <span class="jtbd-tag">🚀 Ликвидность и Скорость сделки</span>
+                    <h3>«Когда я продаю или покупаю ММ, я хочу сделать это полностью в цифре за 24 часа, без 10 поездок в МФЦ и бесконечных звонков».</h3>
+                    <p class="quote">"Машино-место - это мелкий актив. Процесс его продажи не должен занимать столько же времени, сколько продажа квартиры. Нужна кнопка 'Купить в 1 клик'."</p>
+                    <div class="badge badge-blue">�-апрос на ликвидность</div>
+                </div>
+
+                <div class="jtbd-item">
+                    <span class="jtbd-tag">📈 Инвестиционный актив</span>
+                    <h3>«Когда у меня есть свободный капитал, я хочу вложить его в ММ (поштучно или пулом), имея прозрачную оценку доходности и возможность быстрого выхода из актива».</h3>
+                    <p class="quote">"Ищу альтернативу депозитам. Важно понимать реальную рыночную цену объекта и иметь возможность перепродать его так же быстро, как акции."</p>
+                    <div class="badge badge-green">Инвест-драйвер</div>
+                </div>
+
+                <div class="jtbd-item">
+                    <span class="jtbd-tag">🏠 Гарантированное владение</span>
+                    <h3>«Когда я возвращаюсь домой, я хочу иметь свое законное место, чтобы не тратить время на поиск парковки и быть уверенным в сохранности автомобиля».</h3>
+                    <p class="quote">"Свое место - это не роскошь, а экономия 30 минут жизни каждый вечер и спокойный сон без страха, что машину притрут во дворе."</p>
+                    <div class="badge badge-blue">Базовая потребность</div>
+                </div>
+
+                <div class="jtbd-item">
+                    <span class="jtbd-tag">⚡ Технологии и Инфраструктура (EV)</span>
+                    <h3>«Когда я покупаю современное авто, я хочу место, которое интегрировано в цифровую среду: с зарядкой для EV, 5G-покрытием и автоматическим доступом».</h3>
+                    <p class="quote">"Бесит, когда в паркинге не ловит связь или нужно прикладывать грязную карту. Хочу, чтобы всё управлялось из приложения Домклик."</p>
+                    <div class="badge badge-orange">Премиум-тренд</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: PERSONAS -->
+        <div id="section-personas" class="section">
+            <h2>Персоны пользователей</h2>
+            <div class="cards">
+                <!-- PERSONA 1 -->
+                <div class="card">
+                    <div class="persona-header">
+                        <div class="avatar">👨‍💻</div>
+                        <div>
+                            <h3 style="margin:0">Сергей, 34 года</h3>
+                            <p style="font-size: 12px; color: var(--text-secondary);">IT-специалист, Москва (ЖК Комфорт+)</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px;">
+                        <p><strong>Контекст:</strong> Работает в гибридном графике, часто задерживается. Семья, один автомобиль.</p>
+                        <p style="margin-top: 8px;"><strong>JTBD:</strong> «Когда я возвращаюсь домой поздно, я хочу иметь гарантированное место, чтобы не тратить время на поиски и не беспокоиться за авто».</p>
+                        <p style="margin-top: 8px;"><strong>Топ боли:</strong></p>
+                        <ul style="margin-left: 16px;">
+                            <li>Поиск места в ЖК после 21:00 (20+ мин)</li>
+                            <li>Страх отдать деньги «под расписку» без СБР</li>
+                            <li>3 поездки в МФЦ на оформление одного ДКП</li>
+                        </ul>
+                    </div>
+                    <div class="simulator">
+                        <div class="q-box">
+                            <p style="font-size: 12px; font-weight: 600;">Симулятор: Что тебя бесит больше всего?</p>
+                            <button class="btn-show" onclick="toggleAns(this)">Показать ответ</button>
+                            <div class="a-box">
+                                "Бесит, что для покупки клочка бетона за 1.5 млн нужно брать отгул, ехать в МФЦ и надеяться, что продавец не исчезнет после передачи денег."
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PERSONA 2 -->
+                <div class="card">
+                    <div class="persona-header">
+                        <div class="avatar">👩‍💼</div>
+                        <div>
+                            <h3 style="margin:0">Елена, 42 года</h3>
+                            <p style="font-size: 12px; color: var(--text-secondary);">Инвестор, Санкт-Петербург</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px;">
+                        <p><strong>Контекст:</strong> Владеет 5 машино-местами в разных ЖК. Раньше инвестировала в студии.</p>
+                        <p style="margin-top: 8px;"><strong>JTBD:</strong> «Когда у меня есть свободная ликвидность, я хочу купить ММ как актив с гарантией чистоты и возможностью быстрой перепродажи».</p>
+                        <p style="margin-top: 8px;"><strong>Топ боли:</strong></p>
+                        <ul style="margin-left: 16px;">
+                            <li>Долгий цикл экспозиции (160+ дней)</li>
+                            <li>Высокая удельная стоимость оформления сделки</li>
+                            <li>Невозможность проверить обременения в 1 клик</li>
+                        </ul>
+                    </div>
+                    <div class="simulator">
+                        <div class="q-box">
+                            <p style="font-size: 12px; font-weight: 600;">Симулятор: Почему ММ, а не квартиры?</p>
+                            <button class="btn-show" onclick="toggleAns(this)">Показать ответ</button>
+                            <div class="a-box">
+                                "Меньше рисков, чем в жилье, но порог входа в сделку по времени такой же высокий. Хочу нажать кнопку и купить пул мест за 10 минут."
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PERSONA 3 -->
+                <div class="card">
+                    <div class="persona-header">
+                        <div class="avatar">🍼</div>
+                        <div>
+                            <h3 style="margin:0">Анна, 31 год</h3>
+                            <p style="font-size: 12px; color: var(--text-secondary);">Молодая мама, Красногорск (МО)</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px;">
+                        <p><strong>Контекст:</strong> Продает квартиру и ММ в связи с расширением семьи. Каждая минута на счету.</p>
+                        <p style="margin-top: 8px;"><strong>JTBD:</strong> «Когда я переезжаю, я хочу продать своё место за 3 дня, чтобы зафиксировать прибыль и вложиться в новое жильё».</p>
+                        <p style="margin-top: 8px;"><strong>Топ боли:</strong></p>
+                        <ul style="margin-left: 16px;">
+                            <li>Хаос во вторичных продажах (перекупы, звонки)</li>
+                            <li>Необходимость возить ребенка на сделки в МФЦ</li>
+                            <li>Сложность оценки реальной стоимости объекта</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- PERSONA 4: DEVELOPER (B2B) -->
+                <div class="card" style="border: 2px solid var(--accent);">
+                    <div class="persona-header">
+                        <div class="avatar">�-️</div>
+                        <div>
+                            <h3 style="margin:0">Максим, 38 лет</h3>
+                            <p style="font-size: 12px; color: var(--text-secondary);">Комм. директор застройщика, Москва</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px;">
+                        <p><strong>Контекст:</strong> Управляет продажами в 3 крупных ЖК. На балансе 450+ непроданных ММ.</p>
+                        <p style="margin-top: 8px;"><strong>JTBD:</strong> «Когда у нас копятся остатки, я хочу цифровой канал реализации жителям, чтобы не тратить ресурсы менеджеров».</p>
+                        <p style="margin-top: 8px;"><strong>Топ боли:</strong></p>
+                        <ul style="margin-left: 16px;">
+                            <li>�-амороженный капитал в «мертвых» остатках</li>
+                            <li>Высокая стоимость оформления мелких сделок</li>
+                            <li>Отсутствие прозрачного трекинга C2C сделок в ЖК</li>
+                        </ul>
+                    </div>
+                    <div class="simulator">
+                        <div class="q-box">
+                            <p style="font-size: 12px; font-weight: 600;">Симулятор: В чем главная сложность продажи?</p>
+                            <button class="btn-show" onclick="toggleAns(this)">Показать ответ</button>
+                            <div class="a-box">
+                                "Нам дорого оформлять сделки. Продажа ММ на 1.5 млн стоит столько же ресурсов, сколько на квартиру 15 млн. Нам нужен 'Fast Track' от ДомКлик для цифровых продаж."
+                            </div>
+                        </div>
+                    </div>
+                    <div class="badge badge-blue" style="margin-top: 12px;">B2B Сегмент</div>
+                </div>
+
+                <!-- PERSONA 5: INVESTMENT BUYER -->
+                <div class="card">
+                    <div class="persona-header">
+                        <div class="avatar">�-</div>
+                        <div>
+                            <h3 style="margin:0">Дмитрий, 29 лет</h3>
+                            <p style="font-size: 12px; color: var(--text-secondary);">Инвестор-новичок</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px;">
+                        <p><strong>Контекст:</strong> Хочет зайти в недвижимость с малым чеком (2 млн). Боится «первички».</p>
+                        <p style="margin-top: 8px;"><strong>JTBD:</strong> «Когда у меня есть свободные 2 млн, я хочу купить проверенный актив, чтобы перепродать его через 2 года».</p>
+                        <p style="margin-top: 8px;"><strong>Топ боли:</strong></p>
+                        <ul style="margin-left: 16px;">
+                            <li>Риск покупки объекта с обременением</li>
+                            <li>Отсутствие истории сделок для аналитики</li>
+                            <li>Сложность пакетного оформления нескольких ММ</li>
+                        </ul>
+                    </div>
+                    <div class="badge badge-green" style="margin-top: 12px;">Покупатель</div>
+                </div>
+
+                <!-- PERSONA 6: EV OWNER -->
+                <div class="card">
+                    <div class="persona-header">
+                        <div class="avatar">⚡</div>
+                        <div>
+                            <h3 style="margin:0">Виктор, 45 лет</h3>
+                            <p style="font-size: 12px; color: var(--text-secondary);">Предприниматель, владелец Zeekr</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px;">
+                        <p><strong>Контекст:</strong> Живет в ЖК бизнес-класса. Главная проблема - ночная зарядка.</p>
+                        <p style="margin-top: 8px;"><strong>JTBD:</strong> «Когда я покупаю электромобиль, я хочу место с мощностями под зарядку, чтобы заряжаться ночью».</p>
+                        <p style="margin-top: 8px;"><strong>Топ боли:</strong></p>
+                        <ul style="margin-left: 16px;">
+                            <li>�-апреты УК на установку зарядных станций</li>
+                            <li>Отсутствие фильтров по EV-ready местам</li>
+                            <li>Сложность проверки ТУ на электроэнергию</li>
+                        </ul>
+                    </div>
+                    <div class="badge badge-orange" style="margin-top: 12px;">EV Сегмент</div>
+                </div>
+
+                <!-- PERSONA 7: MANAGEMENT CO -->
+                <div class="card">
+                    <div class="persona-header">
+                        <div class="avatar">🏢</div>
+                        <div>
+                            <h3 style="margin:0">Валентина, 52 года</h3>
+                            <p style="font-size: 12px; color: var(--text-secondary);">Директор УК «Уютный Дом»</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px;">
+                        <p><strong>Контекст:</strong> Контролирует паркинг на 1200 мест. Тратит 30% времени на споры жителей.</p>
+                        <p style="margin-top: 8px;"><strong>JTBD:</strong> «Когда в паркинге хаос, я хочу цифровой реестр собственников, чтобы исключить конфликты и левые заезды».</p>
+                        <p style="margin-top: 8px;"><strong>Топ боли:</strong></p>
+                        <ul style="margin-left: 16px;">
+                            <li>Неактуальные данные о собственниках ММ</li>
+                            <li>Конфликты при передаче пультов и ключей</li>
+                            <li>Сложность администрирования гостевых доступов</li>
+                        </ul>
+                    </div>
+                    <div class="badge badge-blue" style="margin-top: 12px;">Инфраструктура</div>
+                </div>
+
+                <!-- PERSONA 8: PROFESSIONAL LIQUIDATOR (NEW) -->
+                <div class="card" style="border: 2px solid #10B981;">
+                    <div class="persona-header">
+                        <div class="avatar">📈</div>
+                        <div>
+                            <h3 style="margin:0">Артем, 40 лет</h3>
+                            <p style="font-size: 12px; color: var(--text-secondary);">Профессиональный перекупщик ММ</p>
+                        </div>
+                    </div>
+                    <div style="font-size: 13px;">
+                        <p><strong>Контекст:</strong> Выкупает недооцененные ММ и продает их после сдачи ЖК. Работает с объемами.</p>
+                        <p style="margin-top: 8px;"><strong>JTBD:</strong> «Когда я работаю с пулом из 10+ объектов, я хочу удаленное оформление, чтобы не ездить в МФЦ каждую неделю».</p>
+                        <p style="margin-top: 8px;"><strong>Топ боли:</strong></p>
+                        <ul style="margin-left: 16px;">
+                            <li>Операционные затраты на бумажное оформление</li>
+                            <li>Низкая ликвидность при ручной продаже</li>
+                            <li>Отсутствие инструментов для массового маркетинга лотов</li>
+                        </ul>
+                    </div>
+                    <div class="badge badge-green" style="margin-top: 12px;">Power User</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: EVOLUTION -->
+        <div id="section-evolution" class="section">
+            <h2>Эволюция запроса пользователя (2022 -> 2025)</h2>
+            <div class="tbl-container">
+                <table class="tbl">
+                    <thead>
+                        <tr>
+                            <th>Параметр</th>
+                            <th>Как было (2022)</th>
+                            <th>Как сейчас (2025)</th>
+                            <th>Тренд</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Доверие</strong></td>
+                            <td>"Верю на слово соседу"</td>
+                            <td>"Нужен договор / чек"</td>
+                            <td><span class="badge badge-green">Легализация</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Поиск</strong></td>
+                            <td>Объявления в лифтах / чаты</td>
+                            <td>Интегрированные карты / карты ЖК</td>
+                            <td><span class="badge badge-blue">Цифровизация</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Оплата</strong></td>
+                            <td>Наличные / Перевод по номеру</td>
+                            <td>Автоплатеж / Подписка</td>
+                            <td><span class="badge badge-blue">FinTech</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Цена</strong></td>
+                            <td>"Как договорятся"</td>
+                            <td>Динамическое ценообразование</td>
+                            <td><span class="badge badge-orange">Прозрачность</span></td>
+                        </tr>
+                        <tr style="background: #EFF6FF;">
+                            <td><strong>B2B Модель</strong></td>
+                            <td>Ручное оформление ДКП</td>
+                            <td>Цифровая сделка + Автоподача в Росреестр</td>
+                            <td><span class="badge badge-blue">Новая выручка</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function show(id, el) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('section-' + id).classList.add('active');
+            el.classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function toggleAns(btn) {
+            const ans = btn.nextElementSibling;
+            if (ans.style.display === 'block') {
+                ans.style.display = 'none';
+                btn.innerText = 'Показать ответ';
+            } else {
+                ans.style.display = 'block';
+                btn.innerText = 'Скрыть ответ';
+            }
+        }
+    </script>
+</body>
+</html>
+
