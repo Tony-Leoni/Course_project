@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Домклик — Безопасная Сделка по Ссылке (C2C)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="logo-container" id="appLogo" style="cursor: pointer;">
+            <!-- Domclick Official Logo SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="115" height="25" fill="none" class="logo-icon-svg" style="display: block;">
+                <path fill="#21a038" d="M22.4 8.608v4.629h-4.8v-3.61l-6.4-4.343-6.4 4.343v9.704h7.876v4.8H2.464C1.137 24.068 0 22.983 0 21.708V8.608c0-1.146.508-2.042 1.388-2.61L9.85.336c.404-.24.879-.336 1.353-.336s.949.096 1.353.336l8.463 5.662c.88.568 1.388 1.464 1.388 2.61M13.38 16.36v7.766l9.02-10.178h-6.626c-1.327 0-2.396 1.085-2.396 2.422z"/>
+                <path fill="#21a038" fill-rule="evenodd" d="M40.52 15.696h2v4.4h-2.42v-1.924H30.84v1.924H28.42v-4.407h1.583c.609-.713 1.385-2.356 1.636-7.51l.03-2.783h8.838zm-6.313-7.992-.102 2.35c-.274 3.578-.716 5.024-1.248 5.636h5.094V7.704zM48.324 8.228c3.19 0 5.244 2.1 5.244 4.91 0 2.805-2.054 4.91-5.244 4.91s-5.243-2.1-5.244-4.91c0-2.81 2.055-4.91 5.244-4.91m0 2.25c-1.457 0-2.609 1.036-2.609 2.66 0 1.558 1.11 2.68 2.609 2.68 1.517 0 2.634-1.06 2.634-2.68 0-1.583-1.134-2.66-2.634-2.66" clip-rule="evenodd"/>
+                <path fill="#21a038" d="M87.935 17.818H85.47v-6.967h-2.484l-.036 1.013c-.12 5.33-1.78 6.272-4.437 6.013v-2.314c1.427.095 2.006-.576 2.072-4.172l.048-2.932h7.297zM60.402 11.85l3.104-3.394h2.162v9.36H63.2v-5.72l-2.848 2.975h-.066l-2.932-2.975v5.72h-2.46v-9.36h2.228zM70.563 12.115l3.631-3.66h3.105L73 12.903l4.677 4.91h-3.212l-3.888-3.774v3.774h-2.46v-9.36h2.46zM92.831 14.385l4.496-5.929h2.46v9.36H97.33v-5.787l-4.497 5.929h-2.46v-9.36H92.83zM104.583 12.115l3.631-3.66h3.106l-4.303 4.448 4.676 4.91h-3.212l-3.888-3.774v3.774H102.13v-9.36h2.459z"/>
+            </svg>
+        </div>
+        <div id="userBadge" class="user-badge" style="display: none;">
+            <span class="user-avatar-dot" style="width: 8px; height: 8px; background-color: var(--primary); border-radius: 50%;"></span>
+            <span id="userBadgeText">Продавец</span>
+        </div>
+    </header>
+
+    <!-- Portal Subheader Navigation (Visible only on Portal Screens) -->
+    <div id="portalSubheaderNav" class="portal-subheader-nav" style="display: none;">
+        <div class="nav-scroll-wrapper">
+            <span class="nav-item active" id="navItemHome">Главная</span>
+            <span class="nav-item" id="navItemApartment">Квартиры</span>
+            <span class="nav-item" id="navItemHouse">Дома</span>
+            <span class="nav-item" id="navItemParking" style="position: relative;">
+                Машино-места
+                <span class="nav-badge-new">NEW</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Stepper Progress Bar -->
+    <div class="stepper">
+        <div class="step-indicator active" id="step1"></div>
+        <div class="step-indicator" id="step2"></div>
+        <div class="step-indicator" id="step3"></div>
+        <div class="step-indicator" id="step4"></div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="app-content" id="appContent">
+
+        <!-- SCREEN 0: SCENARIO SELECTOR -->
+        <section class="screen active" id="screenSelector">
+            <h2 style="text-align: center; margin-bottom: 8px;">Выберите сценарий</h2>
+            <p class="subtitle" style="text-align: center; margin-bottom: 24px; text-align: center;">Для демонстрации работы сервиса выберите один из путей пользователя.</p>
+
+            <div class="card scenario-card" id="btnChooseP2P" style="cursor: pointer; padding: 20px; border-color: var(--primary);">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="font-size: 32px; line-height: 1;">🔗</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px; color: var(--primary);">Сценарий 1: P2P-ссылка</div>
+                        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Сделка с соседом из домового чата. Продавец сам вводит данные и генерирует платежную ссылку.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card scenario-card" id="btnChoosePortal" style="cursor: pointer; padding: 20px; transition: var(--transition);">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div style="font-size: 32px; line-height: 1;">🏪</div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 15px; margin-bottom: 4px; color: var(--text);">Сценарий 2: Витрина Домклик</div>
+                        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Покупка через каталог объявлений. Покупатель запускает безопасную сделку прямо из карточки машино-места.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 1AA: PORTAL MAIN HOME PAGE -->
+        <section class="screen" id="screenPortalHome">
+            <div style="text-align: center; margin-bottom: 20px; margin-top: 10px;">
+                <h1 style="font-size: 20px; font-weight: 800; color: var(--text); line-height: 1.2; letter-spacing: -0.5px;">Поиск недвижимости</h1>
+                <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Найдите жилье или парковочное место в один клик</p>
+            </div>
+
+            <!-- Portal Search Widget -->
+            <div class="card" style="padding: 16px; border-color: var(--primary-light); box-shadow: var(--shadow-md); margin-bottom: 20px;">
+                <!-- Type pills (Купить / Снять) -->
+                <div style="display: flex; gap: 4px; background-color: #f1f5f9; padding: 4px; border-radius: 8px; margin-bottom: 16px;">
+                    <div style="flex: 1; text-align: center; padding: 6px; font-size: 13px; font-weight: 600; background-color: white; border-radius: 6px; cursor: pointer; color: var(--text);">Купить</div>
+                    <div style="flex: 1; text-align: center; padding: 6px; font-size: 13px; font-weight: 600; border-radius: 6px; cursor: not-allowed; color: var(--text-muted);">Снять</div>
+                </div>
+
+                <!-- Category Tabs (Horizontal Scroll / Grid) -->
+                <div class="form-label" style="margin-bottom: 8px;">Тип недвижимости</div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px;">
+                    <div class="portal-category-tab" id="tabCatApartment" style="padding: 10px 4px; text-align: center; border: 1px solid var(--border); border-radius: 8px; font-size: 11px; font-weight: 500; color: var(--text-muted); cursor: pointer;">Квартира</div>
+                    <div class="portal-category-tab" id="tabCatHouse" style="padding: 10px 4px; text-align: center; border: 1px solid var(--border); border-radius: 8px; font-size: 11px; font-weight: 500; color: var(--text-muted); cursor: pointer;">Дом</div>
+                    <div class="portal-category-tab active" id="tabCatParking" style="padding: 10px 4px; text-align: center; border: 1px solid var(--primary); background-color: var(--primary-light); border-radius: 8px; font-size: 11px; font-weight: 700; color: var(--primary); cursor: pointer; position: relative;">
+                        Машино-место
+                        <span class="portal-badge-new" style="background-color: var(--danger); color: white; font-size: 8px; font-weight: bold; padding: 1px 4px; border-radius: 4px; position: absolute; top: -8px; right: -4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid white; text-transform: uppercase;">NEW</span>
+                    </div>
+                </div>
+
+                <!-- Search Input Fields -->
+                <div class="form-group">
+                    <label class="form-label">Город или ЖК</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-input" id="portalSearchLocation" value="Москва, ЖК Сердце Столицы" style="font-weight: 500;">
+                    </div>
+                </div>
+
+                <!-- Find CTA button -->
+                <button class="btn btn-primary" id="btnPortalSearchFind" style="margin-top: 8px; font-weight: 700;">Найти машино-место</button>
+            </div>
+
+            <button class="btn btn-outline" id="btnBackToSelectorFromHome" style="margin-top: auto;">← К выбору сценария</button>
+        </section>
+
+        <!-- SCREEN 1A: SEARCH CATALOG LISTING -->
+        <section class="screen" id="screenPortalSearch">
+            <h2 style="font-size: 18px; margin-bottom: 2px;">Поиск машино-мест</h2>
+            <p class="subtitle" style="margin-bottom: 16px;">Найдено 3 предложения в ЖК «Сердце Столицы»</p>
+
+            <!-- Search Filter Tags Bar -->
+            <div style="display: flex; gap: 6px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 4px;">
+                <span style="font-size: 11px; background-color: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: 20px; font-weight: 500; white-space: nowrap;">Москва ✖</span>
+                <span style="font-size: 11px; background-color: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: 20px; font-weight: 500; white-space: nowrap;">Сердце Столицы ✖</span>
+                <span style="font-size: 11px; background-color: #f1f5f9; color: var(--text-muted); padding: 4px 10px; border-radius: 20px; font-weight: 500; white-space: nowrap;">Купить ✖</span>
+            </div>
+
+            <!-- List of catalog results -->
+            <div class="card catalog-item-card" id="btnCatalogItem1" style="cursor: pointer; padding: 0; display: flex; overflow: hidden; height: 110px; margin-bottom: 12px; border-color: var(--primary-light);">
+                <div style="width: 110px; min-width: 110px; height: 100%; position: relative;">
+                    <img src="../parking_spot_42.png" alt="Машино-место 42" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="padding: 10px 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 2px;">1 500 000 ₽</div>
+                        <div style="font-size: 12px; font-weight: 600; color: var(--text);">м/м 42 • 14.2 м²</div>
+                        <div style="font-size: 10.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">ул. Шелепихинская наб., 34к1</div>
+                    </div>
+                    <div style="font-size: 10px; color: var(--primary); font-weight: 700; display: flex; align-items: center; gap: 3px;">
+                        <span>⚡ Купить онлайн (СБР)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card catalog-item-card" style="padding: 0; display: flex; overflow: hidden; height: 110px; opacity: 0.6; cursor: not-allowed; margin-bottom: 12px;">
+                <div style="width: 110px; min-width: 110px; height: 100%;">
+                    <img src="../parking_spot_112.png" alt="Машино-место 88" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="padding: 10px 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 2px;">1 850 000 ₽</div>
+                        <div style="font-size: 12px; font-weight: 600; color: var(--text);">м/м 112 • 13.0 м²</div>
+                        <div style="font-size: 10.5px; color: var(--text-muted);">ул. Шелепихинская наб., 34к1</div>
+                    </div>
+                    <div style="font-size: 10px; color: var(--text-muted);">Без онлайн оформления</div>
+                </div>
+            </div>
+
+            <div class="card catalog-item-card" style="padding: 0; display: flex; overflow: hidden; height: 110px; opacity: 0.6; cursor: not-allowed; margin-bottom: 12px;">
+                <div style="width: 110px; min-width: 110px; height: 100%;">
+                    <img src="../parking_spot_15.png" alt="Машино-место 12" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="padding: 10px 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 15px; font-weight: 800; color: var(--text); line-height: 1.2; margin-bottom: 2px;">2 100 000 ₽</div>
+                        <div style="font-size: 12px; font-weight: 600; color: var(--text);">м/м 15 • 15.0 м²</div>
+                        <div style="font-size: 10.5px; color: var(--text-muted);">ул. Шелепихинская наб., 34к1</div>
+                    </div>
+                    <div style="font-size: 10px; color: var(--text-muted);">Без онлайн оформления</div>
+                </div>
+            </div>
+
+            <button class="btn btn-outline" id="btnBackToSelectorFromSearch" style="margin-top: auto;">← К выбору сценария</button>
+        </section>
+
+        <!-- SCREEN 1B: MARKETPLACE LISTING -->
+        <section class="screen" id="screenPortalListing">
+            <div style="display: flex; gap: 4px; font-size: 11px; color: var(--text-muted); margin-bottom: 10px; align-items: center;">
+                <span>Москва</span> <span>/</span> <span>Машино-места</span> <span>/</span> <span>ЖК Сердце Столицы</span>
+            </div>
+
+            <h2 style="font-size: 18px; margin-bottom: 4px;">Машино-место, 14.2 м²</h2>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Москва, ул. Шелепихинская наб., д. 34, корп. 1 • ЖК «Сердце Столицы»</p>
+
+            <!-- Real Photo Gallery -->
+            <div style="width: 100%; height: 250px; flex-shrink: 0; background-color: #f1f5f9; border-radius: var(--radius-md); overflow: hidden; position: relative; margin-bottom: 16px; border: 1px solid var(--border);">
+                <img src="../parking_spot_42.png" alt="Машино-место в ЖК Сердце Столицы" style="width: 100%; height: 100%; object-fit: cover;">
+                <span style="position: absolute; bottom: 10px; right: 10px; background-color: rgba(0,0,0,0.6); color: white; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 500;">Фото 1 из 3</span>
+            </div>
+
+            <!-- Price and CTA -->
+            <div class="card" style="border-color: var(--primary-light); background-color: #fafdfb; padding: 16px; margin-bottom: 16px;">
+                <div style="font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 4px;">1 500 000 ₽</div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">Без ипотеки • Возможна покупка онлайн</div>
+                
+                <button class="btn btn-primary" id="btnPortalBuy" style="background-color: var(--primary);">
+                    Купить онлайн (Безопасная сделка) ⚡
+                </button>
+                <div style="text-align: center; font-size: 10px; color: var(--text-muted); margin-top: 6px;">
+                    Оформление и регистрация права в Росреестре за 24 ч. Сбор сервиса 5 900 ₽
+                </div>
+            </div>
+
+            <!-- Details -->
+            <div class="card" style="margin-bottom: 16px;">
+                <div class="card-title" style="font-size: 14px; margin-bottom: 8px;">О паркинге</div>
+                <div class="object-detail-row" style="padding: 6px 0;">
+                    <span class="object-detail-label" style="font-size: 12.5px;">Тип парковки:</span>
+                    <span class="object-detail-value" style="font-size: 12.5px;">Подземная, уровень -1</span>
+                </div>
+                <div class="object-detail-row" style="padding: 6px 0;">
+                    <span class="object-detail-label" style="font-size: 12.5px;">Номер места:</span>
+                    <span class="object-detail-value" style="font-size: 12.5px;">42 (м/м 4212)</span>
+                </div>
+                <div class="object-detail-row" style="padding: 6px 0;">
+                    <span class="object-detail-label" style="font-size: 12.5px;">Площадь:</span>
+                    <span class="object-detail-value" style="font-size: 12.5px;">14.2 м²</span>
+                </div>
+            </div>
+
+            <!-- Seller Info -->
+            <div class="card" style="margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background-color: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">ЕЛ</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 13px;">Екатерина Л.</div>
+                        <div style="font-size: 11px; color: var(--success); font-weight: 500;">✓ Собственник подтвержден</div>
+                    </div>
+                </div>
+                <span style="font-size: 11px; color: var(--text-muted);">На Домклике с 2021</span>
+            </div>
+
+            <button class="btn btn-outline" id="btnBackToSelector" style="margin-top: auto;">← К выбору сценария</button>
+        </section>
+
+        <!-- SCREEN 1: SELLER INITIATION -->
+        <section class="screen" id="screenSellerInit">
+            <h2>Сделка по ссылке</h2>
+            <p class="subtitle">Оформите безопасную продажу машино-места соседу за 5 минут без посредников и визитов в офисы.</p>
+
+            <div class="card">
+                <div class="card-title">
+                    <svg width="18" height="18" fill="var(--primary)" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                    Данные объекта недвижимости
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Кадастровый номер</label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-input" id="cadastralInput" value="77:01:0001001:4212" placeholder="Например: 77:01:0001001:1234">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Стоимость сделки</label>
+                    <div class="input-wrapper has-suffix">
+                        <input type="number" class="form-input" id="priceInput" value="1500000" step="50000">
+                        <span class="input-suffix">₽</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <svg width="18" height="18" fill="var(--primary)" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 1.21-1.04 1.93-2.7 1.93-1.93 0-2.7-.93-2.79-2.1H4.03c.12 2.15 1.8 3.53 3.97 4.02V21h3v-2.13c2.04-.44 3.6-1.67 3.6-3.79 0-2.87-2.5-3.62-5.7-4.18z"/></svg>
+                    Комиссия и налоги
+                </div>
+
+                <div class="form-label">Кто оплачивает сбор сервиса (5 900 ₽)?</div>
+                <div class="pills-container">
+                    <div class="pill-option active" data-split="50-50">50 / 50<br><span style="font-size: 10px;">по 2 950 ₽</span></div>
+                    <div class="pill-option" data-split="seller">Продавец<br><span style="font-size: 10px;">5 900 ₽</span></div>
+                    <div class="pill-option" data-split="buyer">Покупатель<br><span style="font-size: 10px;">5 900 ₽</span></div>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label class="form-label" style="display: flex; justify-content: space-between;">
+                        <span>Срок владения объектом:</span>
+                        <strong id="ownershipYearsLabel">5 лет</strong>
+                    </label>
+                    <input type="range" class="range-slider" id="ownershipSlider" min="1" max="6" value="5">
+                    <div class="range-values">
+                        <span>1 год</span>
+                        <span>3 года (наследство)</span>
+                        <span>5 лет (мин. срок)</span>
+                    </div>
+                </div>
+
+                <!-- Tax Semaphore -->
+                <div class="tax-semaphore green" id="taxSemaphore">
+                    <span class="tax-semaphore-icon">🛡️</span>
+                    <div>
+                        <div class="tax-title" id="taxTitle">Налог НДФЛ: 0 ₽</div>
+                        <div id="taxDesc">Машино-место в собственности более 5 лет (или от 3 лет при наследстве/дарении). Продавец освобожден от уплаты НДФЛ. Риск занижения цены ДКП исключен.</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btnGenerateLink" style="margin-top: auto;">
+                Создать P2P-ссылку
+            </button>
+        </section>
+
+        <!-- SCREEN 2: LINK SHARING -->
+        <section class="screen" id="screenLinkShare">
+            <h2>Ссылка успешно создана!</h2>
+            <p class="subtitle">Отправьте эту ссылку покупателю в мессенджер. Он сможет проверить объект и внести средства на счет СБР.</p>
+
+            <div class="card">
+                <div class="card-title">Ссылка на сделку</div>
+                <div class="share-link-box">
+                    <span class="share-link-text" id="shareLinkUrl">https://domclick.ru/s/p2p-parking-4212</span>
+                    <button class="btn-copy" id="btnCopyLink">Копировать</button>
+                </div>
+            </div>
+
+            <div class="card" style="background-color: transparent; border: none; box-shadow: none; padding: 0;">
+                <div class="card-title">Имитация чата с покупателем</div>
+                <div class="chat-container">
+                    <div class="chat-message incoming">
+                        Привет! Договорились по поводу паркинга. Как будем проводить сделку?
+                        <div class="chat-time">22:01</div>
+                    </div>
+                    <div class="chat-message outgoing">
+                        Привет! Создал безопасную сделку через Домклик, вот ссылка. Переходи, там все официально:
+                        <div class="p2p-preview-card" id="chatLinkCard">
+                            <div class="p2p-preview-img">
+                                <svg width="40" height="40" fill="var(--primary)" viewBox="0 0 24 24">
+                                    <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm1 9h-2V9h2v3z"/>
+                                </svg>
+                            </div>
+                            <div class="p2p-preview-info">
+                                <div class="p2p-preview-title">Безопасная сделка: Машино-место №4212</div>
+                                <div class="p2p-preview-desc">Сумма: 1 500 000 ₽. Проверено Домклик. Подписание через Госключ.</div>
+                            </div>
+                        </div>
+                        <div class="chat-time">22:03</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btnSimulateBuyer" style="margin-top: auto;">
+                Перейти от лица Покупателя →
+            </button>
+        </section>
+
+        <!-- SCREEN 3: P2P OBJECT PREVIEW (NEW) -->
+        <section class="screen" id="screenP2PPreview">
+            <h2>Предложение о сделке</h2>
+            <p class="subtitle">Вы получили приглашение на покупку машино-места. Изучите объект перед принятием решения.</p>
+
+            <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 12px;">
+                <div style="height: 200px; background: linear-gradient(135deg, #f5f7fa 0%, #e2e8f0 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                    <img src="../parking_spot_42.png" alt="Машино-место" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                    <div style="position: absolute; top: 12px; right: 12px; background: var(--primary); color: white; padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; box-shadow: var(--shadow-sm);">
+                        ✓ ПРОВЕРЕНО ДОМКЛИК
+                    </div>
+                </div>
+                <div style="padding: 16px;">
+                    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">Машино-место №42</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" fill="var(--text-muted)" viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        г. Москва, Шелепихинская наб., д. 34, корп. 1
+                    </p>
+
+                    <div style="display: flex; align-items: baseline; gap: 8px; margin-bottom: 16px;">
+                        <div style="font-size: 24px; font-weight: 700; color: var(--text);" id="p2pPrice">1 500 000 ₽</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">+ сбор 2 950 ₽</div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">Площадь</div>
+                            <div style="font-size: 14px; font-weight: 600;">18 м²</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">Уровень</div>
+                            <div style="font-size: 14px; font-weight: 600;">-1</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">Статус</div>
+                            <div style="font-size: 14px; font-weight: 600; color: var(--success);">Свободно</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #f0f7ff 0%, #e8f5e9 100%); border: 1px solid var(--primary-light);">
+                <div style="display: flex; gap: 12px;">
+                    <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border-radius: 50%; box-shadow: var(--shadow-sm);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px;">Безопасная сделка через Домклик</div>
+                        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Средства будут заморожены на номинальном счете Сбербанка до момента регистрации в Росреестре</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px;">Детали объекта</div>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Кадастровый номер:</span>
+                    <span class="object-detail-value" style="font-family: monospace;" id="p2pCadastral">77:01:0001001:4212</span>
+                </div>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Тип объекта:</span>
+                    <span class="object-detail-value">Самостоятельный (Fast Track)</span>
+                </div>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Обременения:</span>
+                    <span class="object-detail-value" style="color: var(--success); font-weight: 600;">Не обнаружены ✓</span>
+                </div>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Комиссия сервиса:</span>
+                    <span class="object-detail-value" id="p2pFee">2 950 ₽ (ваша часть)</span>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: auto;">
+                <button class="btn btn-outline" id="btnDeclineP2P" style="flex: 1;">Отказаться</button>
+                <button class="btn btn-primary" id="btnProceedP2P" style="flex: 2;">Продолжить сделку</button>
+            </div>
+        </section>
+
+        <!-- SCREEN 4: BUYER SBER ID LOGIN -->
+        <section class="screen" id="screenBuyerLogin">
+            <h2>Оформление покупки</h2>
+            <p class="subtitle">Для продолжения сделки необходимо авторизоваться через Сбер ID.</p>
+
+            <div class="card">
+                <div class="card-title" style="color: var(--primary);">
+                    <svg width="18" height="18" fill="var(--primary)" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    Безопасный контур Сбербанка
+                </div>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Объект:</span>
+                    <span class="object-detail-value">Машино-место №42</span>
+                </div>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Стоимость:</span>
+                    <span class="object-detail-value" id="buyerCostLabel">1 500 000 ₽</span>
+                </div>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Сбор Домклик:</span>
+                    <span class="object-detail-value" id="buyerFeeLabel">2 950 ₽ (50%)</span>
+                </div>
+            </div>
+
+            <p style="font-size: 13px; text-align: center; color: var(--text-muted); margin-bottom: 15px;">
+                Для проверки объекта по ЕГРН и холдирования средств необходимо авторизоваться:
+            </p>
+
+            <button class="btn btn-sber-id" id="btnSberIdLogin" style="margin-top: auto;">
+                <!-- Sber ID logo simulated -->
+                <svg viewBox="0 0 24 24" fill="none" style="margin-right: 6px; width: 24px; height: 24px;">
+                    <circle cx="12" cy="12" r="10" fill="url(#sberGrad)" />
+                    <path d="M7 13.5l3.5 3.5L17 9.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="sberGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#21a038"/>
+                            <stop offset="0.5" stop-color="#27ae60"/>
+                            <stop offset="1" stop-color="#2ecc71"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                Войти по Сбер ID
+            </button>
+        </section>
+
+        <!-- SCREEN 4: BUYER VERIFICATION & ESCROW -->
+        <section class="screen" id="screenBuyerEscrow">
+            <h2>Проверка объекта и оплата</h2>
+            <p class="subtitle">Данные объекта проверены по ЕГРН в режиме реального времени через API Росреестра.</p>
+
+            <div class="card" style="border-color: #a5d6a7; background-color: #f9fdf9;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span class="verification-badge verified">✓ Проверено Домклик</span>
+                    <span style="font-size: 11px; color: var(--text-muted);">Обновлено только что</span>
+                </div>
+                
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Адрес:</span>
+                    <span class="object-detail-value">г. Москва, ул. Шелепихинская наб., д. 34, корп. 1, м/м 42 (-1 уровень)</span>
+                </div>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Кадастровый №:</span>
+                    <span class="object-detail-value" id="verifyCadastral">77:01:0001001:4212</span>
+                </div>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Тип объекта:</span>
+                    <span class="object-detail-value" style="color: var(--primary);">Самостоятельный объект (Fast Track)</span>
+                </div>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Обременения:</span>
+                    <span class="object-detail-value" style="color: var(--success); font-weight: 700;">Не обнаружены</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Безопасный счет Сбербанка (СБР)</div>
+                <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 12px;">
+                    Сумма будет заморожена на номинальном счете Сбербанка. Продавец получит деньги автоматически только после подтверждения перехода права от Росреестра.
+                </p>
+                <div class="object-detail-row">
+                    <span class="object-detail-label">Будет списано с карты:</span>
+                    <span class="object-detail-value" id="totalToFreezeLabel" style="font-size: 17px; color: var(--primary);">1 502 950 ₽</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btnFreezeFunds" style="margin-top: auto;">
+                Заморозить средства
+            </button>
+        </section>
+
+        <!-- SCREEN 5: DIGITAL SIGNING (GOSKLUCH) -->
+        <section class="screen" id="screenSigning">
+            <h2>Подписание договора</h2>
+            <p class="subtitle">Средства зачислены на номинальный счет Сбербанка. Шаг для завершения: подписание ДКП.</p>
+
+            <div class="card" style="padding: 10px; background-color: #f8fafc; max-height: 280px; overflow-y: auto; font-size: 11px; font-family: monospace; border: 1px solid var(--border);">
+                <div style="text-align: center; font-weight: 700; margin-bottom: 10px; font-size: 12px;">ДОГОВОР КУПЛИ-ПРОДАЖИ МАШИНО-МЕСТА</div>
+                <p><strong>Продавец:</strong> Лукошина Екатерина Александровна, паспорт 45** ******</p>
+                <p><strong>Покупатель:</strong> Петров Алексей Игоревич, паспорт 45** ******</p>
+                <p><strong>Предмет договора:</strong> Нежилое помещение (машино-место), расположенное по адресу: г. Москва, ул. Шелепихинская наб., д. 34, корп. 1, м/м 42. Кадастровый номер: <span id="contractCadastral">77:01:0001001:4212</span>.</p>
+                <p><strong>Цена сделки:</strong> <span id="contractPrice">1 500 000</span> рублей РФ. Оплата производится с использованием Сервиса Безопасных Расчетов Сбербанка.</p>
+                <p><strong>Регистрация:</strong> Переход права собственности подлежит регистрации в Едином государственном реестре недвижимости (ЕГРН).</p>
+            </div>
+
+            <div style="margin: 15px 0; display: flex; align-items: flex-start; gap: 8px;">
+                <input type="checkbox" id="agreeCheckbox" style="margin-top: 3px; cursor: pointer;">
+                <label for="agreeCheckbox" style="font-size: 12px; color: var(--text-muted); cursor: pointer;">
+                    Я согласен с условиями ДКП и авторизую отправку документов в Минцифры (Госключ).
+                </label>
+            </div>
+
+            <button class="btn btn-disabled" id="btnSignContract" style="margin-top: auto;">
+                Подписать через Госключ
+            </button>
+        </section>
+
+        <!-- SCREEN 6: STATUS TRACKER -->
+        <section class="screen" id="screenTracker">
+            <div class="success-checkmark">
+                <div class="checkmark">
+                    <svg class="checkmark__circle" viewBox="0 0 52 52">
+                        <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+                    </svg>
+                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                </div>
+            </div>
+            
+            <h2 style="text-align: center; margin-bottom: 2px;">Сделка отправлена в Росреестр</h2>
+            <p class="subtitle" style="text-align: center; margin-bottom: 15px;">Отслеживайте статус оформления в реальном времени.</p>
+
+            <div class="card" style="padding: 12px 16px; margin-bottom: 10px;">
+                <!-- Timeline Tracker -->
+                <div class="timeline">
+                    <div class="timeline-step completed" id="trackStep1">
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Безопасный счет оплачен</div>
+                            <div class="timeline-desc" id="trackDesc1">Сумма 1 500 000 ₽ защищена Сбером</div>
+                        </div>
+                    </div>
+                    <div class="timeline-step completed" id="trackStep2">
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Договор подписан УКЭП</div>
+                            <div class="timeline-desc">Обе стороны подписали ДКП в Госключе</div>
+                        </div>
+                    </div>
+                    <div class="timeline-step active" id="trackStep3">
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title" id="trackTitle3">Передано в Росреестр</div>
+                            <div class="timeline-desc" id="trackDesc3">Ожидаем регистрацию (Fast Track API)</div>
+                        </div>
+                    </div>
+                    <div class="timeline-step" id="trackStep4">
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Регистрация завершена</div>
+                            <div class="timeline-desc">Собственность переоформлена</div>
+                        </div>
+                    </div>
+                    <div class="timeline-step" id="trackStep5">
+                        <div class="timeline-icon"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Выплата продавцу</div>
+                            <div class="timeline-desc">Деньги отправлены на карту Екатерины Л.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: auto;">
+                <button class="btn btn-outline" id="btnRestart" style="flex: 1;">Сначала</button>
+                <button class="btn btn-primary" id="btnSpeedUp" style="flex: 2;">Ускорить время (API) ⚡</button>
+            </div>
+        </section>
+
+        <!-- SCREEN 7: MY PROPERTIES (Personal Cabinet) -->
+        <section class="screen" id="screenMyProperties">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%); border-radius: 50%; margin-bottom: 12px; box-shadow: 0 4px 16px rgba(33, 160, 56, 0.25);">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                    </svg>
+                </div>
+                <h2 style="margin-bottom: 4px;">Поздравляем с покупкой!</h2>
+                <p class="subtitle">Машино-место теперь в вашей собственности</p>
+            </div>
+
+            <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 12px;">
+                <div style="height: 160px; background: linear-gradient(135deg, #f5f7fa 0%, #e2e8f0 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                    <img src="../parking_spot_42.png" alt="Машино-место" style="max-width: 100%; max-height: 100%; object-fit: cover;">
+                    <div style="position: absolute; top: 12px; right: 12px; background: var(--success); color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; box-shadow: var(--shadow-sm);">
+                        МОЯ СОБСТВЕННОСТЬ
+                    </div>
+                </div>
+                <div style="padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div>
+                            <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">Машино-место №42</h3>
+                            <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">г. Москва, Шелепихинская наб., д. 34, корп. 1</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 18px; font-weight: 700; color: var(--primary);" id="myPropertyPrice">1 500 000 ₽</div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">Кадастровый номер</div>
+                            <div style="font-size: 13px; font-weight: 600; font-family: monospace;" id="myPropertyCadastral">77:01:0001001:4212</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 2px;">Дата покупки</div>
+                            <div style="font-size: 13px; font-weight: 600;" id="myPropertyDate">07 июня 2026</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 14px; background: linear-gradient(135deg, #f0f7ff 0%, #e8f5e9 100%); border: 1px solid var(--primary-light);">
+                <div style="display: flex; gap: 12px;">
+                    <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: white; border-radius: 50%; box-shadow: var(--shadow-sm);">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--info)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="12" y1="16" x2="12" y2="12"/>
+                            <line x1="12" y1="8" x2="12.01" y2="8"/>
+                        </svg>
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px;">Документы готовы</div>
+                        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">Выписка из ЕГРН и договор купли-продажи доступны в разделе «Документы»</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: auto;">
+                <button class="btn btn-outline" id="btnViewDocuments" style="flex: 1;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px; vertical-align: middle;">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    Документы
+                </button>
+                <button class="btn btn-primary" id="btnBackToCatalog" style="flex: 1;">В каталог</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Sber ID Bottom Sheet Overlay -->
+    <div class="sber-id-overlay" id="sberIdOverlay">
+        <div class="sber-id-sheet">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <svg viewBox="0 0 24 24" fill="none" style="width: 28px; height: 28px;">
+                        <circle cx="12" cy="12" r="10" fill="#21a038" />
+                        <path d="M7 13.5l3.5 3.5L17 9.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span style="font-weight: 700; font-size: 16px;">Вход по Сбер ID</span>
+                </div>
+                <span id="closeSberSheet" style="cursor: pointer; font-size: 20px; color: var(--text-muted);">&times;</span>
+            </div>
+            
+            <div class="card" style="margin-bottom: 20px; border-color: var(--primary);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; background-color: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: var(--primary);">АП</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 15px;">Алексей Игоревич П.</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">+7 (999) ***-**-88</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btnSberIdConfirm">Продолжить как Алексей</button>
+        </div>
+    </div>
+
+    <!-- Goskluch Signing Modal Overlay -->
+    <div class="sber-id-overlay" id="goskluchOverlay">
+        <div class="sber-id-sheet" style="border-top-left-radius: var(--radius-lg); border-top-right-radius: var(--radius-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 24px; line-height: 1;">🔑</span>
+                    <span style="font-weight: 700; font-size: 16px;">Подтверждение в Госключ</span>
+                </div>
+                <span id="closeGoskluchSheet" style="cursor: pointer; font-size: 20px; color: var(--text-muted);">&times;</span>
+            </div>
+            
+            <div class="card" style="margin-bottom: 20px; border-color: #2f80ed; background-color: #f0f7ff;">
+                <div style="font-size: 14px; margin-bottom: 8px; color: var(--text);">
+                    Вы подписываете документ: <strong>Договор купли-продажи машино-места №<span id="goskluchCadastral">4212</span></strong>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                    Сертификат УКЭП: Петров А.И. (действителен до 2027 г.)
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="btnGoskluchConfirm" style="background-color: #2f80ed;">Подписать УКЭП</button>
+        </div>
+    </div>
+
+    <!-- Notification Toast (Hidden by default) -->
+    <div id="toast" style="position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%) translateY(100px); background-color: #333; color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 1000; box-shadow: var(--shadow-md); opacity: 0; transition: all 0.3s ease; pointer-events: none; text-align: center; width: 85%;">
+        Ссылка скопирована!
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
